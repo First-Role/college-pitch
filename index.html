@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FirstRole for Colleges — The placement cell, reborn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ─────────── Reset & base ─────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    :root {
+      --bg-0: #04050B;
+      --bg-1: #080A16;
+      --ink: #F4F6FF;
+      --ink-dim: rgba(244, 246, 255, .62);
+      --ink-mute: rgba(244, 246, 255, .38);
+      --brand: #2362EA;
+      --brand-light: #6AA0FF;
+      --cyan: #7FDDFF;
+      --violet: #B08CFF;
+      --rose: #FF9EC4;
+      --gold: #FFD39A;
+      --glass: rgba(255, 255, 255, .045);
+      --glass-2: rgba(255, 255, 255, .08);
+      --stroke: rgba(255, 255, 255, .10);
+      --stroke-hi: rgba(255, 255, 255, .18);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --ease: cubic-bezier(.22, .61, .36, 1);
+      --ease-soft: cubic-bezier(.16, 1, .3, 1);
+    }
+
+    body {
+      font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--bg-0);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: -0.011em;
+      line-height: 1.5;
+    }
+
+    /* Ambient scene */
+    .scene {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      background: var(--bg-0);
+    }
+
+    .scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(1200px 900px at 12% 18%, rgba(35, 98, 234, .42), transparent 55%),
+        radial-gradient(900px 700px at 88% 20%, rgba(176, 140, 255, .35), transparent 55%),
+        radial-gradient(1000px 800px at 60% 95%, rgba(127, 221, 255, .28), transparent 55%),
+        radial-gradient(700px 700px at 85% 75%, rgba(255, 158, 196, .18), transparent 60%);
+      filter: saturate(1.1);
+      animation: drift 24s var(--ease-soft) infinite alternate;
+    }
+
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background:
+        radial-gradient(600px 600px at 30% 70%, rgba(106, 160, 255, .28), transparent 60%),
+        radial-gradient(500px 500px at 75% 35%, rgba(255, 211, 154, .18), transparent 60%);
+      animation: drift2 32s var(--ease-soft) infinite alternate;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+
+      50% {
+        transform: translate3d(-3%, 2%, 0) scale(1.06);
+      }
+
+      100% {
+        transform: translate3d(2%, -2%, 0) scale(1.02);
+      }
+    }
+
+    @keyframes drift2 {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+      }
+
+      100% {
+        transform: translate3d(-4%, 3%, 0) scale(1.1) rotate(6deg);
+      }
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+      opacity: .55;
+      mix-blend-mode: overlay;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(120% 80% at 50% 50%, transparent 55%, rgba(0, 0, 0, .55) 100%);
+    }
+
+    /* Deck + Slide */
+    .deck {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      width: 100vw;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+
+    .deck::-webkit-scrollbar {
+      display: none;
+    }
+
+    .slide {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(36px, 5vw, 80px);
+      overflow: hidden;
+    }
+
+    .slide .inner {
+      width: 100%;
+      max-width: 1280px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .9s var(--ease-soft), transform 1.1s var(--ease-soft);
+    }
+
+    .slide.is-active .inner {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Glass material */
+    .glass {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .03));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .14),
+        inset 0 -1px 0 rgba(255, 255, 255, .02),
+        0 30px 80px -20px rgba(0, 0, 0, .55),
+        0 2px 6px rgba(0, 0, 0, .25);
+      overflow: hidden;
+    }
+
+    .glass::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, .18), transparent 55%),
+        radial-gradient(60% 60% at 100% 100%, rgba(106, 160, 255, .10), transparent 70%);
+      mix-blend-mode: screen;
+    }
+
+    .glass::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04);
+    }
+
+    .glass-sm {
+      border-radius: var(--radius-md);
+    }
+
+    .glass-xs {
+      border-radius: var(--radius-sm);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--stroke);
+      backdrop-filter: blur(14px) saturate(160%);
+    }
+
+    .chip .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brand-light);
+      box-shadow: 0 0 12px var(--brand-light);
+    }
+
+    /* Typography */
+    .eyebrow {
+      color: var(--ink-mute);
+      font-size: 12px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+    }
+
+    .serif {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -.02em;
+    }
+
+    h1.display {
+      font-size: clamp(54px, 9vw, 148px);
+      line-height: .94;
+      letter-spacing: -.045em;
+      font-weight: 600;
+    }
+
+    h2.head {
+      font-size: clamp(38px, 5.2vw, 78px);
+      line-height: 1.02;
+      letter-spacing: -.035em;
+      font-weight: 600;
+    }
+
+    h3.sub {
+      font-size: clamp(22px, 2.3vw, 32px);
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    p.lede {
+      font-size: clamp(17px, 1.3vw, 20px);
+      line-height: 1.55;
+      color: var(--ink-dim);
+      max-width: 60ch;
+      font-weight: 400;
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: var(--ink-mute);
+      letter-spacing: .02em;
+    }
+
+    .grad-text {
+      background: linear-gradient(100deg, #FFFFFF 20%, #A9C2FF 45%, #FFFFFF 70%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      background-size: 200% 100%;
+      animation: shimmer 8s linear infinite;
+    }
+
+    @keyframes shimmer {
+      to {
+        background-position: -200% 0;
+      }
+    }
+
+    /* Cover — Slide 1 text scale-down (-15%) */
+    .slide:first-of-type h1.display {
+      font-size: clamp(45.9px, 7.65vw, 125.8px);
+    }
+
+    .slide:first-of-type .cover-sub {
+      font-size: clamp(18.7px, 2.04vw, 28.9px);
+    }
+
+    .slide:first-of-type .eyebrow {
+      font-size: 10.2px;
+    }
+
+    /* Cover */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      width: 100%;
+    }
+
+    .cover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 28px;
+    }
+
+    .mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      letter-spacing: -.01em;
+    }
+
+    .mark .sig,
+    .nav-brand .sig {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      box-shadow: none;
+      color: #fff;
+      filter: drop-shadow(0 4px 14px rgba(122, 170, 255, .28));
+    }
+
+    .mark .sig {
+      width: 34px;
+      height: 29px;
+    }
+
+    .nav-brand .sig {
+      width: 24px;
+      height: 20px;
+    }
+
+    .mark .sig svg,
+    .nav-brand .sig svg,
+    .hero-mark svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .hero-mark {
+      width: 168px;
+      height: 142px;
+      margin: 0 auto 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      position: relative;
+      filter:
+        drop-shadow(0 18px 40px rgba(122, 170, 255, .25)) drop-shadow(0 4px 10px rgba(0, 0, 0, .35));
+      animation: heroFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes heroFloat {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    .hero-mark::before {
+      content: "";
+      position: absolute;
+      inset: -40% -28% -20% -28%;
+      background: radial-gradient(closest-side, rgba(122, 170, 255, .22), transparent 72%);
+      filter: blur(12px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .cover-hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      text-align: center;
+      gap: 32px;
+      padding: 0 24px;
+    }
+
+    .cover-hero .display {
+      max-width: 16ch;
+    }
+
+    .cover-sub {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: clamp(22px, 2.4vw, 34px);
+      color: var(--ink-dim);
+      letter-spacing: -.01em;
+    }
+
+    .cover-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      padding: 28px;
+      color: var(--ink-mute);
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px) saturate(160%);
+      opacity: .85;
+      pointer-events: none;
+      animation: float 12s ease-in-out infinite;
+    }
+
+    .orb.b {
+      width: 560px;
+      height: 560px;
+      background: radial-gradient(circle, #2362EA, transparent 70%);
+      top: -180px;
+      left: -120px;
+    }
+
+    .orb.v {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, #B08CFF, transparent 70%);
+      bottom: -160px;
+      right: -120px;
+      animation-delay: -4s;
+    }
+
+    .orb.c {
+      width: 340px;
+      height: 340px;
+      background: radial-gradient(circle, #7FDDFF, transparent 70%);
+      top: 40%;
+      right: 20%;
+      animation-delay: -8s;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translate3d(0, 0, 0);
+      }
+
+      50% {
+        transform: translate3d(10px, -18px, 0);
+      }
+    }
+
+    /* Quote slide */
+    .quote-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .quote-wrap .eyebrow {
+      margin-bottom: 6px;
+    }
+
+    .quote-mark {
+      font-family: 'Instrument Serif', serif;
+      font-size: 120px;
+      line-height: .6;
+      color: var(--brand-light);
+      opacity: .7;
+      margin-bottom: -20px;
+    }
+
+    /* Two-col + stats */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 72px;
+      align-items: center;
+    }
+
+    .stat-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .stat {
+      padding: 26px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat .n {
+      font-size: clamp(44px, 4.6vw, 72px);
+      line-height: 1;
+      font-weight: 600;
+      letter-spacing: -.03em;
+      background: linear-gradient(180deg, #FFFFFF, #B7C8FF 85%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .stat .l {
+      font-size: 14px;
+      color: var(--ink-dim);
+      line-height: 1.5;
+      max-width: 38ch;
+    }
+
+    /* Ecosystem diagram */
+    .diagram {
+      position: relative;
+      width: min(640px, 80vw);
+      aspect-ratio: 1;
+      margin: 0 auto;
+    }
+
+    .diagram .center {
+      position: absolute;
+      inset: 30% 30%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, .25), rgba(35, 98, 234, .7) 60%, rgba(26, 63, 181, .9));
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, .2) inset,
+        0 30px 80px rgba(35, 98, 234, .55),
+        0 0 80px rgba(106, 160, 255, .4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: .02em;
+      line-height: 1.2;
+      padding: 12px;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, .2) inset, 0 30px 80px rgba(35, 98, 234, .55), 0 0 80px rgba(106, 160, 255, .4);
+      }
+
+      50% {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, .28) inset, 0 30px 100px rgba(35, 98, 234, .7), 0 0 120px rgba(106, 160, 255, .55);
+      }
+    }
+
+    .node {
+      position: absolute;
+      width: 170px;
+      padding: 18px 20px;
+      border-radius: 20px;
+    }
+
+    .node .title {
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -.01em;
+    }
+
+    .node .desc {
+      font-size: 12px;
+      color: var(--ink-dim);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .node.tl {
+      top: -8%;
+      left: -4%;
+    }
+
+    .node.tr {
+      top: -8%;
+      right: -4%;
+    }
+
+    .node.bl {
+      bottom: -8%;
+      left: -4%;
+    }
+
+    .node.br {
+      bottom: -8%;
+      right: -4%;
+    }
+
+    .edges {
+      position: absolute;
+      inset: 0;
+    }
+
+    .edges line {
+      stroke: rgba(255, 255, 255, .12);
+      stroke-width: 1;
+    }
+
+    .edges circle {
+      fill: rgba(106, 160, 255, .8);
+    }
+
+    /* Product slides */
+    .product-row {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .product-row.reverse {
+      grid-template-columns: 1.1fr .9fr;
+    }
+
+    .mock {
+      aspect-ratio: 4/3;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    .mock-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 6px;
+    }
+
+    .mock-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mock-dots i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      display: block;
+    }
+
+    .mock-search {
+      flex: 1;
+      max-width: 340px;
+      height: 26px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--stroke);
+      margin: 0 14px;
+    }
+
+    .mock-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 12px;
+    }
+
+    .mock-nav {
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mock-nav i {
+      display: block;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .06);
+    }
+
+    .mock-nav i.act {
+      background: linear-gradient(90deg, rgba(106, 160, 255, .45), rgba(106, 160, 255, .1));
+      border: 1px solid rgba(106, 160, 255, .45);
+    }
+
+    .mock-main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mock-card {
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--stroke);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mock-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .mock-card .tag {
+      font-size: 10px;
+      color: var(--ink-mute);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .mock-card .h {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .bar {
+      height: 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .06);
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #6AA0FF, #B08CFF);
+    }
+
+    .mock-card .ring {
+      --v: 82;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: conic-gradient(from -90deg, #6AA0FF calc(var(--v)*1%), rgba(255, 255, 255, .08) 0);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .mock-card .ring::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border-radius: 50%;
+      background: rgba(6, 7, 18, .92);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+    }
+
+    .mock-card .ring b {
+      position: relative;
+      z-index: 1;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Drive pipeline (for slide 4) */
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      flex: 1;
+    }
+
+    .pipe-col {
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pipe-col .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--ink-mute);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .pipe-col .head b {
+      color: var(--brand-light);
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      letter-spacing: 0;
+    }
+
+    .pipe-card {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .pipe-card .nm {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .pipe-card .mt {
+      color: var(--ink-mute);
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    /* Pills */
+    .pills {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .pill {
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      color: var(--ink-dim);
+      font-weight: 500;
+      letter-spacing: -.005em;
+      background: rgba(255, 255, 255, .035);
+      border: 1px solid var(--stroke);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform .4s var(--ease), background .4s var(--ease), color .4s var(--ease);
+    }
+
+    .pill .ic {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      flex: none;
+      background: linear-gradient(135deg, #2362EA, #B08CFF);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      color: white;
+      font-weight: 600;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
+    }
+
+    .pill:hover {
+      background: rgba(255, 255, 255, .07);
+      color: var(--ink);
+      transform: translateY(-2px);
+    }
+
+    /* Three-col pillars */
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .pillar {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 320px;
+    }
+
+    .pillar .num {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 56px;
+      line-height: 1;
+      color: var(--brand-light);
+      opacity: .8;
+    }
+
+    .pillar .title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+    }
+
+    .pillar .desc {
+      font-size: 14px;
+      color: var(--ink-dim);
+      line-height: 1.55;
+    }
+
+    .pillar ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .pillar li {
+      font-size: 13px;
+      color: var(--ink-dim);
+      display: flex;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .pillar li::before {
+      content: "";
+      width: 14px;
+      height: 1px;
+      background: var(--stroke-hi);
+      margin-top: 10px;
+      flex: none;
+    }
+
+    /* Market / big-stat */
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .big-stat {
+      padding: 32px;
+    }
+
+    .big-stat .n {
+      font-size: clamp(48px, 5.2vw, 78px);
+      line-height: 1;
+      font-weight: 600;
+      letter-spacing: -.04em;
+      background: linear-gradient(180deg, #FFFFFF 40%, rgba(106, 160, 255, .75) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .big-stat .sub {
+      font-size: 13px;
+      color: var(--ink-dim);
+      margin-top: 10px;
+      letter-spacing: .02em;
+      line-height: 1.5;
+    }
+
+    /* Tiers */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .tier {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 380px;
+      position: relative;
+    }
+
+    .tier .who {
+      font-size: 13px;
+      color: var(--ink-mute);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .tier .price {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+    }
+
+    .tier .price small {
+      font-size: 13px;
+      color: var(--ink-dim);
+      font-weight: 400;
+      margin-left: 6px;
+    }
+
+    .tier ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .tier li {
+      font-size: 13.5px;
+      color: var(--ink-dim);
+      display: flex;
+      gap: 10px;
+      line-height: 1.45;
+    }
+
+    .tier li::before {
+      content: "→";
+      color: var(--brand-light);
+      margin-top: 1px;
+      flex: none;
+    }
+
+    .tier.featured {
+      background: linear-gradient(180deg, rgba(35, 98, 234, .22), rgba(176, 140, 255, .10));
+      border-color: rgba(106, 160, 255, .35);
+    }
+
+    .tier.featured .price {
+      color: var(--ink);
+    }
+
+    .tier.featured::after {
+      content: "MOST CHOSEN";
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 10px;
+      letter-spacing: .2em;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(106, 160, 255, .25);
+      color: var(--ink);
+      border: 1px solid rgba(106, 160, 255, .45);
+    }
+
+    /* Timeline rail */
+    .rail {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .rail-row {
+      display: grid;
+      grid-template-columns: 140px 1fr auto;
+      gap: 24px;
+      align-items: center;
+      padding: 22px 28px;
+    }
+
+    .rail-row .when {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 24px;
+      color: var(--brand-light);
+    }
+
+    .rail-row .what {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -.015em;
+    }
+
+    .rail-row .why {
+      font-size: 13px;
+      color: var(--ink-mute);
+      max-width: 32ch;
+      text-align: right;
+    }
+
+    /* Close slide */
+    .close {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 42px;
+      text-align: center;
+    }
+
+    .ask-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      max-width: 960px;
+      width: 100%;
+    }
+
+    .ask {
+      padding: 22px;
+      text-align: left;
+    }
+
+    .ask .t {
+      font-size: 13px;
+      color: var(--ink-mute);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .ask .v {
+      font-size: 18px;
+      font-weight: 500;
+      margin-top: 8px;
+      letter-spacing: -.01em;
+    }
+
+    /* Shell / nav */
+    .shell {
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 28px;
+      pointer-events: none;
+    }
+
+    .shell>* {
+      pointer-events: auto;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-dim);
+      font-size: 13px;
+    }
+
+    .counter {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--ink-dim);
+      font-size: 12px;
+      letter-spacing: .08em;
+      background: rgba(0, 0, 0, .3);
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      backdrop-filter: blur(14px);
+    }
+
+    .counter .now {
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .counter .total {
+      color: var(--ink-mute);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dots {
+      position: fixed;
+      z-index: 10;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .15);
+      border: 0;
+      cursor: pointer;
+      transition: all .3s var(--ease);
+      padding: 0;
+    }
+
+    .dot.active {
+      background: var(--ink);
+      transform: scale(1.4);
+      box-shadow: 0 0 12px rgba(255, 255, 255, .6);
+    }
+
+    .dot:hover {
+      background: rgba(255, 255, 255, .4);
+    }
+
+    .hint {
+      position: fixed;
+      z-index: 10;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      color: var(--ink-mute);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: rgba(0, 0, 0, .3);
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      backdrop-filter: blur(14px);
+      opacity: 1;
+      transition: opacity .6s ease 2s;
+    }
+
+    .hint.fade {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 5px;
+      border: 1px solid var(--stroke-hi);
+      background: rgba(255, 255, 255, .05);
+      font-size: 10px;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      z-index: 9;
+      background: rgba(255, 255, 255, .05);
+    }
+
+    .progress .bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #6AA0FF, #B08CFF, #FF9EC4);
+      transition: width .6s var(--ease-soft);
+      box-shadow: 0 0 12px rgba(106, 160, 255, .7);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+
+      .two-col,
+      .product-row,
+      .product-row.reverse {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .three-col,
+      .market-grid,
+      .tier-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pills {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .pipeline {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .rail-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .rail-row .why {
+        text-align: left;
+      }
+
+      .dots {
+        display: none;
+      }
+
+      h1.display {
+        font-size: clamp(46px, 12vw, 90px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .scene::before,
+      .scene::after,
+      .orb,
+      .diagram .center,
+      .grad-text {
+        animation: none !important;
+      }
+
+      .slide .inner {
+        transition: none;
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- FirstRole logo — embedded once, reused via <use> -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"
+    style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false">
+    <symbol id="fr-logo" viewBox="0 0 332 282">
+      <path
+        d="M0 0 C0.79410658 -0.00085442 1.58821316 -0.00170885 2.40638357 -0.00258917 C5.05183463 -0.00422866 7.69722146 0.00125222 10.34266663 0.00672913 C12.24515278 0.00701135 14.14763904 0.00685257 16.05012512 0.00628662 C21.20451447 0.00600004 26.35888049 0.01187434 31.51326442 0.01886058 C36.90379006 0.02511723 42.29431626 0.02569975 47.68484497 0.02688599 C57.88795718 0.02999248 68.09105866 0.0381967 78.29416615 0.04823548 C89.912002 0.05941777 101.52983836 0.0649124 113.14767826 0.06993091 C137.04218879 0.08037987 160.9366898 0.09796613 184.83119202 0.12025452 C184.02985124 4.13477891 182.69040049 5.40167921 179.39369202 7.87025452 C178.59060608 8.48384827 177.78752014 9.09744202 176.96009827 9.72962952 C174.83119202 11.12025452 174.83119202 11.12025452 172.83119202 11.12025452 C172.83119202 11.78025452 172.83119202 12.44025452 172.83119202 13.12025452 C171.03041077 14.74916077 171.03041077 14.74916077 168.51869202 16.68275452 C167.60345764 17.39689514 166.68822327 18.11103577 165.74525452 18.84681702 C164.78361389 19.59705139 163.82197327 20.34728577 162.83119202 21.12025452 C161.014069 22.59373822 159.20154828 24.0729158 157.39369202 25.55775452 C156.59060608 26.21646545 155.78752014 26.87517639 154.96009827 27.55384827 C154.51424377 27.91978088 154.06838928 28.2857135 153.60902405 28.66273499 C149.35270818 32.15218922 145.09132436 35.63546156 140.83119202 39.12025452 C141.41842041 39.12612076 142.0056488 39.131987 142.610672 39.13803101 C148.77644068 39.20244848 154.9417105 39.28698657 161.10707092 39.38270569 C163.40159995 39.4157611 165.69620651 39.44385197 167.99085999 39.46669006 C171.30776209 39.50059489 174.62396593 39.55292631 177.94056702 39.60853577 C179.45538666 39.61812065 179.45538666 39.61812065 181.00080872 39.62789917 C198.2178521 39.9756119 213.04254386 46.26749675 225.20228577 58.35072327 C235.41337174 69.10801889 241.90932498 81.0630929 242.83119202 96.12025452 C242.91046936 97.3326178 242.91046936 97.3326178 242.99134827 98.56947327 C243.55185921 115.26295147 237.20408301 128.22031469 228.83119202 142.12025452 C229.36228577 142.94267639 229.89337952 143.76509827 230.44056702 144.61244202 C239.75230224 159.23384753 243.23702055 172.71473655 243.58631897 190.07264709 C243.6246387 191.48199789 243.68627082 192.89090301 243.77088928 194.29823303 C244.13636359 200.46552253 244.43876427 205.96281092 240.5907135 211.12709045 C237.79329293 213.69658732 234.92827098 215.92497898 231.83119202 218.12025452 C230.46859358 219.23923271 229.112002 220.36561587 227.76478577 221.50306702 C226.60280498 222.42142725 225.43756746 223.33568591 224.26869202 224.24525452 C223.66734436 224.72478577 223.0659967 225.20431702 222.44642639 225.69837952 C218.08109157 229.12025452 218.08109157 229.12025452 215.83119202 229.12025452 C215.83119202 229.78025452 215.83119202 230.44025452 215.83119202 231.12025452 C215.17119202 231.12025452 214.51119202 231.12025452 213.83119202 231.12025452 C213.83119202 231.78025452 213.83119202 232.44025452 213.83119202 233.12025452 C212.18119202 233.78025452 210.53119202 234.44025452 208.83119202 235.12025452 C208.83119202 235.78025452 208.83119202 236.44025452 208.83119202 237.12025452 C206.9064602 238.74330423 204.97837787 240.25226766 202.95619202 241.74525452 C201.76675312 242.64024215 200.57795892 243.53608718 199.38978577 244.43275452 C198.7927887 244.88134827 198.19579163 245.32994202 197.58070374 245.79212952 C193.59735957 248.81604694 189.72061419 251.97710974 185.83119202 255.12025452 C185.17119202 254.79025452 184.51119202 254.46025452 183.83119202 254.12025452 C183.82572357 252.65566299 183.82572357 252.65566299 183.82014465 251.16148376 C183.78317118 241.95084818 183.72537286 232.7405462 183.64728928 223.53016472 C183.60781384 218.79520678 183.5756257 214.06043484 183.56019592 209.32533264 C183.54502975 204.7539409 183.51058501 200.18306047 183.462883 195.61189651 C183.44806877 193.86968052 183.44015098 192.12739153 183.43930817 190.38511276 C183.43693682 187.94064347 183.40984563 185.49758533 183.37709045 183.05335999 C183.38212082 182.3362233 183.38715118 181.61908661 183.39233398 180.88021851 C183.28843982 175.8548316 181.94085988 173.01886289 178.83119202 169.12025452 C177.09467969 167.46778905 177.09467969 167.46778905 175.26869202 166.30775452 C174.40050842 165.71027405 174.40050842 165.71027405 173.51478577 165.10072327 C169.67954073 162.86720469 166.30012479 162.99456753 161.96083069 162.99327087 C161.25801311 162.99171088 160.55519552 162.99015089 159.83108044 162.98854363 C157.47041937 162.98454737 155.10982234 162.98771798 152.74916077 162.99085999 C151.0590257 162.98950534 149.36889093 162.98772504 147.67875671 162.98554993 C143.08383081 162.98098317 138.48892731 162.98276206 133.89400101 162.98592901 C129.09075611 162.98845651 124.28751316 162.98611398 119.48426819 162.98454285 C111.41728877 162.9827223 103.35031849 162.98512447 95.28334045 162.98988342 C85.94991034 162.99532582 76.61650206 162.99356309 67.28307247 162.98805702 C59.27708467 162.98352264 51.27110345 162.98287694 43.26511478 162.98549569 C38.48020126 162.98705667 33.695298 162.9872571 28.91038513 162.9839592 C24.41247406 162.98107579 19.91459121 162.98306487 15.4166832 162.98885345 C13.76345746 162.99017852 12.11022935 162.98979121 10.45700455 162.98759079 C8.20515513 162.98486938 5.95339691 162.98827263 3.70155334 162.99327087 C2.43982803 162.9936479 1.17810272 162.99402493 -0.12185669 162.99441338 C-3.21322932 162.98127801 -3.21322932 162.98127801 -6.16880798 164.12025452 C-6.16880798 164.78025452 -6.16880798 165.44025452 -6.16880798 166.12025452 C-8.06724548 167.84681702 -8.06724548 167.84681702 -10.54380798 169.74525452 C-11.35591736 170.37689514 -12.16802673 171.00853577 -13.00474548 171.65931702 C-15.16880798 173.12025452 -15.16880798 173.12025452 -17.16880798 173.12025452 C-17.16880798 173.78025452 -17.16880798 174.44025452 -17.16880798 175.12025452 C-19.11206263 176.78326166 -21.06652477 178.33276519 -23.10630798 179.87025452 C-24.38770406 180.8553528 -25.66758246 181.84242755 -26.94615173 182.83119202 C-27.97071472 183.62348206 -27.97071472 183.62348206 -29.01597595 184.43177795 C-32.78617188 187.38876084 -36.47661377 190.44182163 -40.16880798 193.49525452 C-41.22636292 194.36875549 -41.22636292 194.36875549 -42.30528259 195.25990295 C-42.98212097 195.81967834 -43.65895935 196.37945374 -44.35630798 196.95619202 C-45.32503845 197.75621643 -45.32503845 197.75621643 -46.31333923 198.57240295 C-47.52809644 199.58576621 -48.73426133 200.60954093 -49.93052673 201.64466858 C-53.96543044 205.12025452 -53.96543044 205.12025452 -56.16880798 205.12025452 C-56.16880798 205.78025452 -56.16880798 206.44025452 -56.16880798 207.12025452 C-57.81880798 207.45025452 -59.46880798 207.78025452 -61.16880798 208.12025452 C-61.23907094 188.41334645 -61.29188052 168.70646401 -61.3242445 148.99945641 C-61.33967497 139.84794792 -61.36069095 130.69651754 -61.39512634 121.5450592 C-61.4251462 113.56321743 -61.4444107 105.58143225 -61.45107347 97.59953558 C-61.45496453 93.37810289 -61.4640282 89.15683203 -61.48599815 84.93545151 C-61.50656283 80.95130251 -61.51260204 76.96737995 -61.50813103 72.98318291 C-61.50894739 71.5312991 -61.51479295 70.07940665 -61.52642441 68.6275692 C-61.66986549 49.77737857 -57.46312472 34.46550442 -45.64927673 19.59681702 C-44.16880798 18.12025452 -44.16880798 18.12025452 -42.16880798 18.12025452 C-42.16880798 17.46025452 -42.16880798 16.80025452 -42.16880798 16.12025452 C-41.50880798 16.12025452 -40.84880798 16.12025452 -40.16880798 16.12025452 C-40.16880798 15.46025452 -40.16880798 14.80025452 -40.16880798 14.12025452 C-29.1971149 4.10374412 -14.53937916 -0.05797022 0 0 Z M6.39369202 34.05775452 C2.0503701 38.01066548 2.0503701 38.01066548 -0.16880798 39.12025452 C-0.16880798 39.78025452 -0.16880798 40.44025452 -0.16880798 41.12025452 C-0.73470642 41.37677795 -1.30060486 41.63330139 -1.88365173 41.89759827 C-4.43136264 43.26073248 -6.49196937 44.85660523 -8.73130798 46.68275452 C-9.59626892 47.38529358 -10.46122986 48.08783264 -11.35240173 48.81166077 C-12.2818158 49.5734967 -13.21122986 50.33533264 -14.16880798 51.12025452 C-15.19103455 51.95427795 -16.21326111 52.78830139 -17.26646423 53.64759827 C-19.90357862 55.80152524 -22.53752978 57.95920473 -25.16880798 60.12025452 C-23.65199305 63.9337158 -21.42427772 65.79277548 -18.23130798 68.30775452 C-17.24904236 69.09021545 -16.26677673 69.87267639 -15.25474548 70.67884827 C-14.23638611 71.48451233 -13.21802673 72.29017639 -12.16880798 73.12025452 C-10.22824978 74.69983818 -8.29063504 76.28304642 -6.35630798 77.87025452 C-5.00279236 78.97433655 -5.00279236 78.97433655 -3.62193298 80.10072327 C-1.59362184 81.77052718 0.40361393 83.46800277 2.39369202 85.18275452 C4.57317816 87.32766923 4.57317816 87.32766923 6.83119202 87.12025452 C6.83119202 87.78025452 6.83119202 88.44025452 6.83119202 89.12025452 C9.29445913 90.76492191 9.29445913 90.76492191 11.83119202 92.12025452 C12.16119202 88.49025452 12.49119202 84.86025452 12.83119202 81.12025452 C14.26366776 81.13144066 14.26366776 81.13144066 15.7250824 81.14285278 C24.75794303 81.20748052 33.78982257 81.22436878 42.8228817 81.19541264 C47.46625287 81.18203809 52.10837076 81.18504585 56.75160217 81.22645569 C61.23912599 81.26585812 65.72468165 81.26096951 70.21222305 81.22633171 C71.91770679 81.22076493 73.62331935 81.23072695 75.32860947 81.25702095 C86.92615999 81.4613677 86.92615999 81.4613677 96.76087952 75.71156311 C98.14211306 74.20316796 99.50274566 72.67534047 100.83119202 71.12025452 C101.85903775 70.23522521 102.90969591 69.37486814 103.99525452 68.56166077 C105.21341858 67.63160217 105.21341858 67.63160217 106.45619202 66.68275452 C107.29408264 66.04466858 108.13197327 65.40658264 108.99525452 64.74916077 C109.60111389 64.2116217 110.20697327 63.67408264 110.83119202 63.12025452 C110.83119202 62.46025452 110.83119202 61.80025452 110.83119202 61.12025452 C111.49119202 61.12025452 112.15119202 61.12025452 112.83119202 61.12025452 C112.83119202 60.46025452 112.83119202 59.80025452 112.83119202 59.12025452 C113.37259827 58.88306702 113.91400452 58.64587952 114.47181702 58.40150452 C117.46369339 56.77677695 119.94278601 54.77006682 122.58119202 52.62025452 C123.56603577 51.82619202 124.55087952 51.03212952 125.56556702 50.21400452 C126.68705139 49.17759827 126.68705139 49.17759827 127.83119202 48.12025452 C127.83119202 47.46025452 127.83119202 46.80025452 127.83119202 46.12025452 C128.49119202 46.12025452 129.15119202 46.12025452 129.83119202 46.12025452 C129.83119202 45.46025452 129.83119202 44.80025452 129.83119202 44.12025452 C130.82119202 43.79025452 131.81119202 43.46025452 132.83119202 43.12025452 C132.83119202 42.79025452 132.83119202 42.46025452 132.83119202 42.12025452 C93.23119202 41.79025452 53.63119202 41.46025452 12.83119202 41.12025452 C12.33619202 35.67525452 12.33619202 35.67525452 11.83119202 30.12025452 C9.75532162 30.12025452 7.81540118 32.7634305 6.39369202 34.05775452 Z M169.83119202 71.12025452 C169.83119202 74.75025452 169.83119202 78.38025452 169.83119202 82.12025452 C168.85257706 82.11137207 167.8739621 82.10248962 166.86569214 82.09333801 C157.64029256 82.01222877 148.41496538 81.95227792 139.18929005 81.91300583 C134.44631901 81.89213676 129.70363598 81.86383159 124.96083069 81.8184967 C120.38317728 81.7750146 115.80580077 81.75111229 111.22795677 81.74074554 C109.48203358 81.73335841 107.73612543 81.71893294 105.99032021 81.69733429 C103.54347184 81.66826823 101.09776551 81.66429975 98.65077209 81.66615295 C97.93004013 81.65177185 97.20930817 81.63739075 96.46673584 81.62257385 C92.85147362 81.65217382 90.92263992 82.06201553 87.84246826 84.02363586 C85.60043631 85.87657712 85.60043631 85.87657712 85.83119202 88.12025452 C83.83119202 89.12025452 81.83119202 90.12025452 79.83119202 91.12025452 C79.83119202 91.78025452 79.83119202 92.44025452 79.83119202 93.12025452 C79.17119202 93.12025452 78.51119202 93.12025452 77.83119202 93.12025452 C77.83119202 93.78025452 77.83119202 94.44025452 77.83119202 95.12025452 C77.17119202 95.12025452 76.51119202 95.12025452 75.83119202 95.12025452 C75.83119202 95.78025452 75.83119202 96.44025452 75.83119202 97.12025452 C75.23306702 97.40900452 74.63494202 97.69775452 74.01869202 97.99525452 C71.6379141 99.16767477 71.6379141 99.16767477 68.83119202 101.12025452 C68.83119202 101.78025452 68.83119202 102.44025452 68.83119202 103.12025452 C68.25369202 103.38837952 67.67619202 103.65650452 67.08119202 103.93275452 C64.77569159 105.14954641 62.81063009 106.42359331 60.83119202 108.12025452 C60.83119202 108.78025452 60.83119202 109.44025452 60.83119202 110.12025452 C60.25884827 110.37677795 59.68650452 110.63330139 59.09681702 110.89759827 C56.60470419 112.24247985 54.69764121 113.80538569 52.58119202 115.68275452 C51.52158264 116.61281311 51.52158264 116.61281311 50.44056702 117.56166077 C49.64392639 118.33316467 49.64392639 118.33316467 48.83119202 119.12025452 C48.83119202 119.45025452 48.83119202 119.78025452 48.83119202 120.12025452 C88.76119202 120.45025452 128.69119202 120.78025452 169.83119202 121.12025452 C169.83119202 124.75025452 169.83119202 128.38025452 169.83119202 132.12025452 C175.37104528 128.02585009 180.73089314 123.78342154 186.01869202 119.37025452 C193.16115502 113.44438657 200.42421924 107.71090875 207.83119202 102.12025452 C204.27015214 98.46706203 200.55611151 95.08408429 196.64369202 91.80775452 C196.07489319 91.32919006 195.50609436 90.85062561 194.9200592 90.3575592 C189.9559795 86.19530505 184.92247646 82.1259593 179.83119202 78.12025452 C178.9791217 77.44478577 178.12705139 76.76931702 177.24916077 76.07337952 C173.86092945 72.84665222 173.86092945 72.84665222 169.83119202 71.12025452 Z M-2.16880798 123.12025452 C-2.25732327 125.71384773 -2.28406743 128.28065143 -2.26646423 130.87416077 C-2.26504929 131.64960739 -2.26363434 132.42505402 -2.26217651 133.22399902 C-2.25656144 135.71028946 -2.24400645 138.19649112 -2.23130798 140.68275452 C-2.22629492 142.36439384 -2.22173168 144.04603458 -2.21763611 145.72767639 C-2.20658711 149.85857018 -2.18931243 153.98939728 -2.16880798 158.12025452 C-0.51880798 157.46025452 1.13119202 156.80025452 2.83119202 156.12025452 C2.83119202 155.46025452 2.83119202 154.80025452 2.83119202 154.12025452 C3.68390686 153.73160217 3.68390686 153.73160217 4.55384827 153.33509827 C7.05006795 152.00349566 9.07123687 150.46517598 11.26869202 148.68275452 C12.13752014 147.97892639 13.00634827 147.27509827 13.90150452 146.54994202 C16.01394368 144.7980258 18.11200414 143.03545145 20.19837952 141.25306702 C20.7701593 140.76507629 21.34193909 140.27708557 21.93104553 139.77430725 C23.04937496 138.81667291 24.16459968 137.85539758 25.27626038 136.89002991 C27.6733793 134.83190501 29.9906341 133.0264016 32.71791077 131.42103577 C33.41529358 130.99177795 34.11267639 130.56252014 34.83119202 130.12025452 C34.83119202 129.46025452 34.83119202 128.80025452 34.83119202 128.12025452 C35.42931702 127.83150452 36.02744202 127.54275452 36.64369202 127.24525452 C39.02446994 126.07283426 39.02446994 126.07283426 41.83119202 124.12025452 C41.83119202 123.46025452 41.83119202 122.80025452 41.83119202 122.12025452 C35.72564491 122.09560938 29.62012651 122.07742081 23.51454163 122.06532288 C21.43576046 122.06028163 19.35698285 122.05344877 17.2782135 122.04481506 C14.29716616 122.03274029 11.31616552 122.02702428 8.33509827 122.02259827 C7.39968704 122.01743698 6.46427582 122.0122757 5.5005188 122.00695801 C4.639702 122.00688248 3.77888519 122.00680695 2.89198303 122.00672913 C1.74947838 122.00339821 1.74947838 122.00339821 0.58389282 122 C-1.19691403 121.92934497 -1.19691403 121.92934497 -2.16880798 123.12025452 Z "
+        fill="#EDECEC" transform="translate(76.16880798339844,15.879745483398438)" />
+      <path
+        d="M0 0 C1.14892731 -0.0033284 2.29785461 -0.0066568 3.4815979 -0.01008606 C5.90732423 -0.01513918 8.33305748 -0.01749488 10.75878906 -0.01733398 C14.45649746 -0.01951939 18.15390687 -0.03768965 21.8515625 -0.05664062 C24.21354065 -0.05957515 26.57552021 -0.06155955 28.9375 -0.0625 C30.58629654 -0.07327827 30.58629654 -0.07327827 32.2684021 -0.08427429 C48.26237193 -0.0370107 61.25444591 6.25648964 72.47265625 17.3984375 C82.68374222 28.15573312 89.17969546 40.11080713 90.1015625 55.16796875 C90.18083984 56.38033203 90.18083984 56.38033203 90.26171875 57.6171875 C90.8222297 74.3106657 84.4744535 87.26802892 76.1015625 101.16796875 C76.89820313 102.40160156 76.89820313 102.40160156 77.7109375 103.66015625 C87.02267272 118.28156176 90.50739103 131.76245078 90.85668945 149.12036133 C90.89500918 150.52971213 90.95664131 151.93861724 91.04125977 153.34594727 C91.40673407 159.51323676 91.70913475 165.01052516 87.86108398 170.17480469 C85.06366341 172.74430155 82.19864146 174.97269321 79.1015625 177.16796875 C77.73896407 178.28694695 76.38237248 179.4133301 75.03515625 180.55078125 C73.87317546 181.46914148 72.70793795 182.38340014 71.5390625 183.29296875 C70.93771484 183.7725 70.33636719 184.25203125 69.71679688 184.74609375 C65.35146205 188.16796875 65.35146205 188.16796875 63.1015625 188.16796875 C63.1015625 188.82796875 63.1015625 189.48796875 63.1015625 190.16796875 C62.4415625 190.16796875 61.7815625 190.16796875 61.1015625 190.16796875 C61.1015625 190.82796875 61.1015625 191.48796875 61.1015625 192.16796875 C58.6265625 193.15796875 58.6265625 193.15796875 56.1015625 194.16796875 C56.1015625 194.82796875 56.1015625 195.48796875 56.1015625 196.16796875 C54.17683068 197.79101846 52.24874835 199.29998189 50.2265625 200.79296875 C49.0371236 201.68795639 47.8483294 202.58380141 46.66015625 203.48046875 C46.06315918 203.9290625 45.46616211 204.37765625 44.85107422 204.83984375 C40.86773005 207.86376117 36.99098467 211.02482397 33.1015625 214.16796875 C32.4415625 213.83796875 31.7815625 213.50796875 31.1015625 213.16796875 C31.09609406 211.70337723 31.09609406 211.70337723 31.09051514 210.209198 C31.05354167 200.99856241 30.99574334 191.78826044 30.91765976 182.57787895 C30.87818432 177.84292101 30.84599618 173.10814907 30.83056641 168.37304688 C30.81540023 163.80165513 30.7809555 159.23077471 30.73325348 154.65961075 C30.71843926 152.91739476 30.71052146 151.17510576 30.70967865 149.432827 C30.7073073 146.9883577 30.68021611 144.54529956 30.64746094 142.10107422 C30.6524913 141.38393753 30.65752167 140.66680084 30.66270447 139.92793274 C30.5588103 134.90254583 29.21123036 132.06657712 26.1015625 128.16796875 C24.36505017 126.51550328 24.36505017 126.51550328 22.5390625 125.35546875 C21.96027344 124.95714844 21.38148438 124.55882812 20.78515625 124.1484375 C18.95417013 123.00541752 18.95417013 123.00541752 16.1015625 122.16796875 C16.1015625 121.50796875 16.1015625 120.84796875 16.1015625 120.16796875 C-39.9984375 120.16796875 -96.0984375 120.16796875 -153.8984375 120.16796875 C-153.8984375 119.50796875 -153.8984375 118.84796875 -153.8984375 118.16796875 C-152.9084375 118.16796875 -151.9184375 118.16796875 -150.8984375 118.16796875 C-150.8984375 117.50796875 -150.8984375 116.84796875 -150.8984375 116.16796875 C-150.29128906 115.91144531 -149.68414062 115.65492188 -149.05859375 115.390625 C-146.64740211 114.02588181 -145.8218526 112.91119907 -144.3359375 110.60546875 C-140.38223731 105.09817353 -135.20861624 101.30288526 -129.8984375 97.16796875 C-127.2298372 94.97993495 -124.56197779 92.79100262 -121.89453125 90.6015625 C-119.8984375 89.16796875 -119.8984375 89.16796875 -117.8984375 89.16796875 C-117.8984375 88.50796875 -117.8984375 87.84796875 -117.8984375 87.16796875 C-113.16448003 82.83977906 -108.99722629 80.91447576 -102.58964539 80.92745972 C-101.01430275 80.92333572 -101.01430275 80.92333572 -99.40713501 80.91912842 C-98.26561981 80.92631897 -97.12410461 80.93350952 -95.94799805 80.94091797 C-94.13273872 80.94047989 -94.13273872 80.94047989 -92.2808075 80.94003296 C-88.97119337 80.94118588 -85.66183009 80.95120224 -82.35226035 80.96518087 C-78.89026872 80.97770065 -75.42827359 80.97885972 -71.96626282 80.98123169 C-65.41444327 80.9874428 -58.86269062 81.0038486 -52.31090051 81.02393067 C-44.85023461 81.04630118 -37.38956548 81.05728599 -29.92887437 81.06732154 C-14.58535564 81.08821517 0.75809217 81.12378778 16.1015625 81.16796875 C16.1015625 84.79796875 16.1015625 88.42796875 16.1015625 92.16796875 C19.5665625 91.67296875 19.5665625 91.67296875 23.1015625 91.16796875 C23.1840625 90.56984375 23.2665625 89.97171875 23.3515625 89.35546875 C24.35398806 86.43172753 25.46304576 85.76496572 28.1015625 84.16796875 C30.43489583 83.16796875 32.76822917 82.16796875 35.1015625 81.16796875 C37.99638345 79.4793232 38.9621147 78.44686434 40.4765625 75.41796875 C43.69828151 68.97453073 48.59573638 64.66016998 54.1015625 60.16796875 C53.67447998 59.8212915 53.24739746 59.47461426 52.80737305 59.11743164 C47.90368284 55.13643284 43.00181524 51.153198 38.1015625 47.16796875 C37.53244141 46.70519531 36.96332031 46.24242187 36.37695312 45.765625 C22.00462372 34.07102997 22.00462372 34.07102997 17.1015625 29.16796875 C16.7715625 32.79796875 16.4415625 36.42796875 16.1015625 40.16796875 C-9.3084375 40.16796875 -34.7184375 40.16796875 -60.8984375 40.16796875 C-57.51859406 34.53489634 -57.51859406 34.53489634 -54.61328125 31.8359375 C-54.00033203 31.26552734 -53.38738281 30.69511719 -52.75585938 30.10742188 C-52.12228516 29.52927734 -51.48871094 28.95113281 -50.8359375 28.35546875 C-50.19849609 27.75798828 -49.56105469 27.16050781 -48.90429688 26.54492188 C-44.15717857 22.16796875 -44.15717857 22.16796875 -41.8984375 22.16796875 C-41.8984375 21.50796875 -41.8984375 20.84796875 -41.8984375 20.16796875 C-41.2384375 20.16796875 -40.5784375 20.16796875 -39.8984375 20.16796875 C-39.8984375 19.50796875 -39.8984375 18.84796875 -39.8984375 18.16796875 C-38.23261814 16.57800106 -36.48902362 15.06880779 -34.7109375 13.60546875 C-33.74800781 12.79980469 -32.78507812 11.99414062 -31.79296875 11.1640625 C-28.98630114 9.22856028 -27.24411074 8.5166038 -23.8984375 8.16796875 C-23.8984375 7.50796875 -23.8984375 6.84796875 -23.8984375 6.16796875 C-22.9703125 5.76578125 -22.9703125 5.76578125 -22.0234375 5.35546875 C-19.5989142 4.21240027 -19.5989142 4.21240027 -17.8984375 1.16796875 C-12.17172389 -0.46009941 -5.90952608 0.00596083 0 0 Z "
+        fill="#EFEEEE" transform="translate(228.8984375,56.83203125)" />
+    </symbol>
+  </svg>
+
+  <!-- Ambient layers -->
+  <div class="scene" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- Progress -->
+  <div class="progress">
+    <div class="bar" id="progressBar"></div>
+  </div>
+
+  <!-- Side dots -->
+  <nav class="dots" id="dots" aria-label="Slide navigation"></nav>
+
+  <!-- Bottom shell -->
+  <div class="shell">
+    <div class="nav-brand"><span class="sig" aria-hidden="true"><svg viewBox="0 0 332 282"
+          xmlns="http://www.w3.org/2000/svg">
+          <use href="#fr-logo" />
+        </svg></span>FirstRole<span style="opacity:.45">&nbsp;·&nbsp;For Colleges &nbsp;·&nbsp; 2026</span></div>
+    <div class="counter"><span class="now" id="slideNow">01</span><span style="opacity:.3">/</span><span class="total"
+        id="slideTotal">12</span></div>
+  </div>
+  <div class="hint" id="hint">
+    <span>Navigate</span>
+    <span class="kbd">←</span><span class="kbd">→</span>
+    <span style="opacity:.4">·</span>
+    <span class="kbd">F</span><span>fullscreen</span>
+  </div>
+
+  <!-- ─────────── DECK ─────────── -->
+  <main class="deck" id="deck">
+
+    <!-- 01 Cover -->
+    <section class="slide" data-title="Cover">
+      <span class="orb b"></span>
+      <span class="orb v"></span>
+      <span class="orb c"></span>
+      <div class="inner">
+        <div class="cover">
+          <div class="cover-top">
+            <div class="mark"><span class="sig" aria-hidden="true"><svg viewBox="0 0 332 282"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <use href="#fr-logo" />
+                </svg></span>FirstRole</div>
+            <div class="chip"><span class="dot"></span>For Colleges &amp; TPOs · 2026</div>
+          </div>
+          <div class="cover-hero">
+            <div class="hero-mark" aria-label="FirstRole logo"><svg viewBox="0 0 332 282"
+                xmlns="http://www.w3.org/2000/svg" role="img">
+                <title>FirstRole</title>
+                <use href="#fr-logo" />
+              </svg></div>
+            <div class="eyebrow">An operating system for your placement cell</div>
+            <h1 class="display grad-text">Your placement season.<br />Rebuilt on AI.</h1>
+            <div class="cover-sub">One portal for every student, drive, recruiter, and report.</div>
+          </div>
+          <div class="cover-bottom">
+            <span>app.firstrole.in</span>
+            <span>Pilot proposal · Training &amp; Placement Cell</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 The reality today -->
+    <section class="slide" data-title="The Reality">
+      <div class="inner">
+        <div class="two-col">
+          <div>
+            <div class="chip" style="margin-bottom:24px;"><span class="dot"
+                style="background:#FF9EC4;box-shadow:0 0 12px #FF9EC4"></span>The reality on campus</div>
+            <h2 class="head" style="max-width:16ch;">Placement still runs on spreadsheets, WhatsApp, and late nights.
+            </h2>
+            <p class="lede" style="margin-top:28px;">
+              The CGPA lives in one sheet. Resumes in a drive folder. Shortlists on WhatsApp.
+              Offers in an inbox. Reports assembled by hand, two weeks after the drive.
+              Top students are invisible until they're offered. At-risk students are invisible for four years.
+            </p>
+          </div>
+          <div class="stat-grid">
+            <div class="glass stat">
+              <span class="n">80+ hrs</span>
+              <span class="l">Average TPO time per mid-size drive &mdash; invites, shortlists, feedback, reports.</span>
+            </div>
+            <div class="glass stat">
+              <span class="n">14</span>
+              <span class="l">Tools a typical placement cell touches: Excel, WhatsApp, Gmail, Forms, Zoom,
+                Drive&hellip;</span>
+            </div>
+            <div class="glass stat">
+              <span class="n">0</span>
+              <span class="l">Real-time view of student readiness at branch, semester, or cohort level.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 Meet FirstRole for Colleges -->
+    <section class="slide" data-title="Meet FirstRole">
+      <div class="inner">
+        <div class="two-col">
+          <div>
+            <div class="chip" style="margin-bottom:24px;"><span class="dot"></span>Introducing</div>
+            <h2 class="head" style="max-width:15ch;">One cockpit.<br />Every placement <span
+                class="serif">workflow.</span></h2>
+            <p class="lede" style="margin-top:28px;">
+              FirstRole is the operating system for modern placement cells. Invite students,
+              run drives end-to-end, coach each student with AI, and deliver NAAC-ready reports &mdash;
+              all from one portal. Built on secure Supabase with RLS on every table, OTP on every
+              privileged session, and multi-channel notifications over email, in-app, and WhatsApp.
+            </p>
+          </div>
+          <div class="diagram">
+            <svg class="edges" viewBox="0 0 600 600" fill="none" aria-hidden="true">
+              <line x1="120" y1="120" x2="300" y2="300" />
+              <line x1="480" y1="120" x2="300" y2="300" />
+              <line x1="120" y1="480" x2="300" y2="300" />
+              <line x1="480" y1="480" x2="300" y2="300" />
+              <circle cx="210" cy="210" r="2" />
+              <circle cx="390" cy="210" r="2" />
+              <circle cx="210" cy="390" r="2" />
+              <circle cx="390" cy="390" r="2" />
+            </svg>
+            <div class="center">Your<br />Placement Cell</div>
+            <div class="glass glass-sm node tl">
+              <div class="title">Students</div>
+              <div class="desc">Invited, coached, assessed, ranked</div>
+            </div>
+            <div class="glass glass-sm node tr">
+              <div class="title">Drives</div>
+              <div class="desc">Lifecycle, stages, feedback, ROI</div>
+            </div>
+            <div class="glass glass-sm node bl">
+              <div class="title">Recruiters</div>
+              <div class="desc">CRM, touchpoints, verified pool</div>
+            </div>
+            <div class="glass glass-sm node br">
+              <div class="title">Reports</div>
+              <div class="desc">NAAC · NIRF · audit-ready</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 Run every drive end-to-end -->
+    <section class="slide" data-title="Drives">
+      <div class="inner">
+        <div class="product-row reverse">
+          <div>
+            <div class="chip" style="margin-bottom:22px;"><span class="dot"></span>Drives, end-to-end</div>
+            <h2 class="head">From <span class="serif">"please share JD"</span> to <span class="serif">offer letter
+                sent.</span></h2>
+            <p class="lede" style="margin-top:22px;">
+              Every drive runs on a single timeline. Eligibility auto-applies against CGPA and branch.
+              Participants move through stages &mdash; shortlist, aptitude, interview, offer &mdash; with
+              interview feedback captured inline. Drive ROI shows cost-per-offer and hours-per-offer,
+              so the cell can finally justify its own budget.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:24px;">
+              <span class="chip">CSV bulk invites</span>
+              <span class="chip">Auto-eligibility</span>
+              <span class="chip">Stage progression</span>
+              <span class="chip">Inline feedback</span>
+              <span class="chip">Cost &amp; hours per offer</span>
+            </div>
+          </div>
+          <div class="glass mock">
+            <div class="mock-header">
+              <div class="mock-dots"><i></i><i></i><i></i></div>
+              <div class="mock-search"></div>
+              <div style="font-size:11px;color:var(--ink-mute);letter-spacing:.1em;">TPO · DRIVE &middot; TCS DIGITAL
+                2026</div>
+            </div>
+            <div class="pipeline">
+              <div class="pipe-col">
+                <div class="head">Shortlist <b>248</b></div>
+                <div class="pipe-card">
+                  <div class="nm">A. Sharma · CSE</div>
+                  <div class="mt">CGPA 8.7 · React/Node</div>
+                </div>
+                <div class="pipe-card">
+                  <div class="nm">M. Reddy · ECE</div>
+                  <div class="mt">CGPA 8.4 · Python</div>
+                </div>
+                <div class="pipe-card" style="opacity:.65">
+                  <div class="nm">+ 246 more</div>
+                </div>
+              </div>
+              <div class="pipe-col">
+                <div class="head">Aptitude <b>112</b></div>
+                <div class="pipe-card">
+                  <div class="nm">R. Iyer · IT</div>
+                  <div class="mt">Score 82 · passed</div>
+                </div>
+                <div class="pipe-card">
+                  <div class="nm">K. Das · CSE</div>
+                  <div class="mt">Score 76 · passed</div>
+                </div>
+                <div class="pipe-card" style="opacity:.65">
+                  <div class="nm">+ 110 more</div>
+                </div>
+              </div>
+              <div class="pipe-col">
+                <div class="head">Interview <b>38</b></div>
+                <div class="pipe-card">
+                  <div class="nm">P. Menon</div>
+                  <div class="mt">Round 2 scheduled</div>
+                </div>
+                <div class="pipe-card">
+                  <div class="nm">S. Kulkarni</div>
+                  <div class="mt">Tech &#10004; · HR pending</div>
+                </div>
+              </div>
+              <div class="pipe-col">
+                <div class="head">Offer <b>14</b></div>
+                <div class="pipe-card" style="background:rgba(106,160,255,.15);border-color:rgba(106,160,255,.35)">
+                  <div class="nm">A. Sharma</div>
+                  <div class="mt">&#8377;8.5 LPA · accepted</div>
+                </div>
+                <div class="pipe-card" style="background:rgba(106,160,255,.15);border-color:rgba(106,160,255,.35)">
+                  <div class="nm">R. Iyer</div>
+                  <div class="mt">&#8377;8.5 LPA · accepted</div>
+                </div>
+              </div>
+            </div>
+            <div
+              style="display:flex;justify-content:space-between;align-items:center;padding:6px 4px 0;font-size:11px;color:var(--ink-mute);letter-spacing:.06em;">
+              <span>Cost / offer · &#8377;2,140</span>
+              <span>Hours / offer · 5.8</span>
+              <span>Conversion · 5.6%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 Institutional Dashboard -->
+    <section class="slide" data-title="Dashboard">
+      <div class="inner">
+        <div style="text-align:center;margin-bottom:34px;">
+          <div class="chip" style="margin-bottom:18px;"><span class="dot"></span>Institutional Dashboard</div>
+          <h2 class="head">Every student, every branch,<br />every semester &mdash; <span class="serif">at a
+              glance.</span></h2>
+        </div>
+        <div class="three-col">
+          <div class="glass pillar">
+            <span class="num">01</span>
+            <div class="title">Branch &times; Semester heatmap</div>
+            <div class="desc">Readiness, engagement, and placement % per cell. Drill into any cohort, ask why, get a
+              chart back.</div>
+            <ul>
+              <li>Live readiness pulse per student</li>
+              <li>Engagement &amp; attendance scoring</li>
+              <li>Placement conversion by branch</li>
+            </ul>
+          </div>
+          <div class="glass pillar">
+            <span class="num">02</span>
+            <div class="title">At Risk &amp; Top Performer walls</div>
+            <div class="desc">Auto curated. Configurable metric &mdash; XP, assessments, placements. Snapshots persist,
+              so you can see trends, not just today.</div>
+            <ul>
+              <li>Top performers surfaced weekly</li>
+              <li>At risk students, flagged early</li>
+              <li>Snapshot history &mdash; trendable</li>
+            </ul>
+          </div>
+          <div class="glass pillar">
+            <span class="num">03</span>
+            <div class="title">Year over year &amp; Drive ROI</div>
+            <div class="desc">Your placement trend, drillable by branch. Course effectiveness scorecard shows skill lift
+              per course assigned. Drive ROI: hours and cost per offer, every drive.</div>
+            <ul>
+              <li>Your placement trendline</li>
+              <li>Course lift: before vs after</li>
+              <li>Drive ROI, auto-calculated</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 Market Intelligence + Market Pulse -->
+    <section class="slide" data-title="Market Intelligence">
+      <div class="inner">
+        <div style="text-align:center;margin-bottom:38px;">
+          <div class="chip" style="margin-bottom:18px;"><span class="dot"></span>Market Intelligence · Market Pulse
+          </div>
+          <h2 class="head">Know what the market wants<br /><span class="serif">before</span> the market tells you.</h2>
+          <p class="lede" style="margin:22px auto 0;text-align:center;max-width:66ch;">
+            Every Monday at 06:00 IST, FirstRole scrapes live JDs across the country and delivers
+            an AI brief to your TPO: <em>the top 5 in demand skills your students lack this week,
+              recommended courses to close the gap, and sample JDs driving demand.</em>
+          </p>
+        </div>
+        <div class="market-grid">
+          <div class="glass big-stat">
+            <div class="n">Weekly</div>
+            <div class="sub">AI generated <em>Market Pulse</em> brief per college. Cached 7&nbsp;days. Delivered by
+              email and pinned to the dashboard.</div>
+          </div>
+          <div class="glass big-stat">
+            <div class="n">Live</div>
+            <div class="sub">Skill gap heatmap by branch, powered by real-time JD scraping. Supplied vs in demand, side
+              by side.</div>
+          </div>
+          <div class="glass big-stat">
+            <div class="n">Action</div>
+            <div class="sub">One click to assign recommended courses to a cohort. Track lift in branch readiness over
+              the next 6&nbsp;weeks.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 AI for every student -->
+    <section class="slide" data-title="Student AI">
+      <div class="inner">
+        <div style="text-align:center;margin-bottom:38px;">
+          <div class="chip" style="margin-bottom:18px;"><span class="dot"></span>Included for every student</div>
+          <h2 class="head">You're not buying a portal.<br />You're giving every student <span class="serif">24 AI
+              coaches.</span></h2>
+          <p class="lede" style="margin:22px auto 0;text-align:center;max-width:64ch;">
+            Every student your cell onboards gets access to the full FirstRole AI stack &mdash;
+            quota enforced at the college level, cached intelligently, and routed between Gemini 2.5 Pro,
+            Flash, and GPT&#8209;5 per task. Your placements get sharper every month, automatically.
+          </p>
+        </div>
+        <div class="glass" style="padding:26px;">
+          <div class="pills">
+            <div class="pill"><span class="ic">AI</span>Job Matching</div>
+            <div class="pill"><span class="ic">AI</span>ATS Resume Score</div>
+            <div class="pill"><span class="ic">AI</span>Cover Letter</div>
+            <div class="pill"><span class="ic">AI</span>Skill Gap Analysis</div>
+            <div class="pill"><span class="ic">AI</span>Mock Interview</div>
+            <div class="pill"><span class="ic">AI</span>Face Proctoring</div>
+            <div class="pill"><span class="ic">AI</span>Application Coach</div>
+            <div class="pill"><span class="ic">AI</span>Tailored Resume</div>
+            <div class="pill"><span class="ic">AI</span>Career Simulator</div>
+            <div class="pill"><span class="ic">AI</span>Placement Notebook</div>
+            <div class="pill"><span class="ic">AI</span>Mock GD</div>
+            <div class="pill"><span class="ic">AI</span>Study Buddy</div>
+            <div class="pill"><span class="ic">AI</span>Peer Benchmark</div>
+            <div class="pill"><span class="ic">AI</span>Skill Decay</div>
+            <div class="pill"><span class="ic">AI</span>Spaced Repetition</div>
+            <div class="pill"><span class="ic">AI</span>You vs Past You</div>
+            <div class="pill"><span class="ic">AI</span>Sentiment Nudge</div>
+            <div class="pill"><span class="ic">AI</span>Parent Share Card</div>
+            <div class="pill"><span class="ic">AI</span>Course Recs</div>
+            <div class="pill"><span class="ic">AI</span>Application Diary</div>
+            <div class="pill"><span class="ic">AI</span>Social Profile Scan</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 Parent + Recruiter CRM -->
+    <section class="slide" data-title="Relationships">
+      <div class="inner">
+        <div style="text-align:center;margin-bottom:42px;">
+          <div class="chip" style="margin-bottom:18px;"><span class="dot"></span>The relationship layer</div>
+          <h2 class="head">Parents in the loop.<br />Recruiters in a <span class="serif">real CRM.</span></h2>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+          <div class="glass" style="padding:32px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+              <div
+                style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7FDDFF,#2362EA);display:grid;place-items:center;font-weight:600;font-size:14px;">
+                P</div>
+              <h3 class="sub">Parent Communications</h3>
+            </div>
+            <p class="lede">Dual consent WhatsApp channel to guardians. Auto triggered on offers, shortlists,
+              and placement milestones. Either the student opts in or the TPO attests consent &mdash;
+              every send is audit logged in an admin only ledger.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px;">
+              <span class="chip" style="justify-content:flex-start;">Consent gated</span>
+              <span class="chip" style="justify-content:flex-start;">AiSensy templates</span>
+              <span class="chip" style="justify-content:flex-start;">Auto on milestones</span>
+              <span class="chip" style="justify-content:flex-start;">Full audit log</span>
+            </div>
+          </div>
+          <div class="glass" style="padding:32px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+              <div
+                style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#B08CFF,#FF9EC4);display:grid;place-items:center;font-weight:600;font-size:14px;">
+                R</div>
+              <h3 class="sub">Recruiter CRM</h3>
+            </div>
+            <p class="lede">One row per (college, employer). Rounds run, offers made, avg package, last contact.
+              Append only touchpoint log &mdash; manual entries, drive events, emails sent. Filter by
+              <span class="serif" style="color:var(--ink);">active</span>,
+              <span class="serif" style="color:var(--ink);">cold</span>, or
+              <span class="serif" style="color:var(--ink);">lost</span>. Your entire recruiter memory, in one place.
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px;">
+              <span class="chip" style="justify-content:flex-start;">Touchpoint log</span>
+              <span class="chip" style="justify-content:flex-start;">HR directory</span>
+              <span class="chip" style="justify-content:flex-start;">Status filters</span>
+              <span class="chip" style="justify-content:flex-start;">Lapsed recruiter alerts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 NAAC + Security -->
+    <section class="slide" data-title="Compliance">
+      <div class="inner">
+        <div style="text-align:center;margin-bottom:34px;">
+          <div class="chip" style="margin-bottom:18px;"><span class="dot"></span>Compliance &amp; trust</div>
+          <h2 class="head">Audit ready from <span class="serif">day one.</span></h2>
+        </div>
+        <div class="three-col">
+          <div class="glass pillar">
+            <span class="num">01</span>
+            <div class="title">NAAC &amp; NIRF reports</div>
+            <div class="desc">Server side PDF generation. Year over year placement %, top recruiters, average and median
+              package, branch wise breakdown, drive summary &mdash; all from the live dataset.</div>
+            <ul>
+              <li>Five&#8209;year historical trend</li>
+              <li>Branch &amp; cohort breakdowns</li>
+              <li>One click export for accreditors</li>
+            </ul>
+          </div>
+          <div class="glass pillar">
+            <span class="num">02</span>
+            <div class="title">Security, layered</div>
+            <div class="desc">Student PII is real PII. We treat it that way. Row-level security on every table. OTP on
+              every privileged session. Cloudflare Turnstile on signup. AES&#8209;GCM client storage.</div>
+            <ul>
+              <li>RLS on every table, no exceptions</li>
+              <li>OTP on TPO &amp; employer logins</li>
+              <li>9+ layers of proctoring on tests</li>
+              <li>Encrypted client-side storage</li>
+            </ul>
+          </div>
+          <div class="glass pillar">
+            <span class="num">03</span>
+            <div class="title">Append only audit trails</div>
+            <div class="desc">Every parent message, every drive action, every recruiter touchpoint is logged. Immutable.
+              Admin only. You never answer an audit question twice.</div>
+            <ul>
+              <li>Parent message log</li>
+              <li>Drive effort log</li>
+              <li>Recruiter touchpoint log</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 Pricing -->
+    <section class="slide" data-title="Pricing">
+      <div class="inner">
+        <div style="text-align:center;margin-bottom:34px;">
+          <div class="chip" style="margin-bottom:18px;"><span class="dot"></span>Simple. Per student. Everything
+            included.</div>
+          <h2 class="head">One plan, <span class="serif">sized to your cell.</span></h2>
+        </div>
+        <div class="tier-grid">
+          <div class="glass tier">
+            <div class="who">Starter</div>
+            <div class="price">Up to 500<small>· students</small></div>
+            <p class="lede" style="font-size:14px;">Single branch or smaller institution. Everything you need to run a
+              full placement season, professionally.</p>
+            <ul>
+              <li>Bulk invites &amp; 5 step student onboarding</li>
+              <li>Drives, assessments, events</li>
+              <li>Institutional dashboard &amp; analytics</li>
+              <li>All 24 AI tools for every student</li>
+              <li>Weekly Market Pulse brief</li>
+              <li>NAAC &amp; NIRF reports</li>
+              <li>Email support</li>
+            </ul>
+          </div>
+          <div class="glass tier">
+            <div class="who">Growth</div>
+            <div class="price">500 &ndash; 2,500<small>· students</small></div>
+            <p class="lede" style="font-size:14px;">Multi branch institutions. Everything in Starter, plus deeper
+              relationships and dedicated support.</p>
+            <ul>
+              <li>Everything in Starter</li>
+              <li>Recruiter CRM + HR directory</li>
+              <li>Parent WhatsApp (consent-gated)</li>
+              <li>Drive ROI &amp; course effectiveness scorecards</li>
+              <li>At risk &amp; top performer walls</li>
+              <li>Priority onboarding · dedicated CSM</li>
+              <li>Slack support channel</li>
+            </ul>
+          </div>
+          <div class="glass tier">
+            <div class="who">Enterprise</div>
+            <div class="price">2,500+<small>· students</small></div>
+            <p class="lede" style="font-size:14px;">NIRF top&#8209;100, autonomous, and deemed universities. Custom
+              SLAs, custom integrations, custom AI quotas.</p>
+            <ul>
+              <li>Everything in Growth</li>
+              <li>Custom AI token quotas</li>
+              <li>SSO &amp; SAML integration</li>
+              <li>Custom report templates</li>
+              <li>99.9% SLA · 24&times;7 support</li>
+              <li>Quarterly business review</li>
+            </ul>
+          </div>
+        </div>
+        <p class="tiny" style="text-align:center;margin-top:24px;letter-spacing:.08em;">
+          Annual. Billed per active student seat. Unlimited TPO &amp; coordinator logins. No setup fees.
+        </p>
+      </div>
+    </section>
+
+    <!-- 11 14-day implementation -->
+    <section class="slide" data-title="Implementation">
+      <div class="inner">
+        <div style="text-align:center;margin-bottom:34px;">
+          <div class="chip" style="margin-bottom:18px;"><span class="dot"></span>Implementation</div>
+          <h2 class="head">Live in <span class="serif">14 days.</span><br />Not 14 weeks.</h2>
+        </div>
+        <div class="rail">
+          <div class="glass rail-row">
+            <span class="when">Day 1&ndash;2</span>
+            <span class="what">Kickoff &amp; institution profile</span>
+            <span class="why">Admin onboarded account, logo, NIRF rank, affiliation, branches, contacts.</span>
+          </div>
+          <div class="glass rail-row">
+            <span class="when">Day 3&ndash;5</span>
+            <span class="what">Data migration &amp; bulk student invite</span>
+            <span class="why">CSV upload &rarr; magic link invites &rarr; 5-step student onboarding begins.</span>
+          </div>
+          <div class="glass rail-row">
+            <span class="when">Day 6&ndash;9</span>
+            <span class="what">TPO training &amp; runbook</span>
+            <span class="why">Two live sessions. A drive walkthrough. Your cell's playbook, documented.</span>
+          </div>
+          <div class="glass rail-row">
+            <span class="when">Day 10&ndash;12</span>
+            <span class="what">Soft launch &amp; AI enablement</span>
+            <span class="why">First cohort active. AI tools on. Weekly Market Pulse subscribed.</span>
+          </div>
+          <div class="glass rail-row">
+            <span class="when">Day 13&ndash;14</span>
+            <span class="what">Go&#8209;live &mdash; first drive runs end to end</span>
+            <span class="why">Shortlist &rarr; aptitude &rarr; interview &rarr; offer, all on FirstRole. Support Slack
+              open.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 CTA -->
+    <section class="slide" data-title="Close">
+      <span class="orb b" style="top:-220px;left:40%;"></span>
+      <span class="orb v" style="bottom:-220px;left:10%;"></span>
+      <div class="inner">
+        <div class="close">
+          <div class="eyebrow">The invitation</div>
+          <h2 class="head grad-text" style="max-width:22ch;">
+            Pilot with us<br />this semester.
+          </h2>
+          <p class="lede" style="text-align:center;max-width:62ch;">
+            We're onboarding a cohort of 25 colleges this intake. Pilots start at zero risk:
+            a 60 day proof period, full feature access, and a go/no go review with your
+            placement committee before annual contracting. Bring your next drive to FirstRole &mdash;
+            we'll run it with you.
+          </p>
+          <div class="ask-grid">
+            <div class="glass ask">
+              <div class="t">Live Demo</div>
+              <div class="v">app.firstrole.in</div>
+            </div>
+            <div class="glass ask">
+              <div class="t">Founder</div>
+              <div class="v">V Chaitanya Chowdari</div>
+            </div>
+            <div class="glass ask">
+              <div class="t">Pilot enquiry</div>
+              <div class="v">partnership@firstrole.in</div>
+            </div>
+          </div>
+          <div class="tiny" style="margin-top:12px;letter-spacing:.22em;text-transform:uppercase;">
+            FirstRole · 2026 · For Colleges &amp; TPOs
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const deck = document.getElementById('deck');
+    const slides = [...deck.querySelectorAll('.slide')];
+    const dotsEl = document.getElementById('dots');
+    const now = document.getElementById('slideNow');
+    const total = document.getElementById('slideTotal');
+    const bar = document.getElementById('progressBar');
+    const hint = document.getElementById('hint');
+
+    total.textContent = String(slides.length).padStart(2, '0');
+
+    slides.forEach((s, i) => {
+      const d = document.createElement('button');
+      d.className = 'dot';
+      d.title = s.dataset.title || `Slide ${i + 1}`;
+      d.setAttribute('aria-label', s.dataset.title || `Go to slide ${i + 1}`);
+      d.onclick = () => scrollToSlide(i);
+      dotsEl.appendChild(d);
+    });
+    const dots = [...dotsEl.children];
+
+    function scrollToSlide(i) {
+      i = Math.max(0, Math.min(slides.length - 1, i));
+      slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function updateActive() {
+      const idx = Math.round(deck.scrollTop / window.innerHeight);
+      slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      now.textContent = String(idx + 1).padStart(2, '0');
+      bar.style.width = ((idx) / (slides.length - 1) * 100) + '%';
+    }
+    updateActive();
+
+    let ticking = false;
+    deck.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => { updateActive(); ticking = false; });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    window.addEventListener('keydown', (e) => {
+      const idx = Math.round(deck.scrollTop / window.innerHeight);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault(); scrollToSlide(idx + 1);
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault(); scrollToSlide(idx - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault(); scrollToSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault(); scrollToSlide(slides.length - 1);
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+
+    let touchY = null;
+    deck.addEventListener('touchstart', e => { touchY = e.changedTouches[0].clientY; }, { passive: true });
+    deck.addEventListener('touchend', e => {
+      if (touchY == null) return;
+      const dy = e.changedTouches[0].clientY - touchY;
+      const idx = Math.round(deck.scrollTop / window.innerHeight);
+      if (Math.abs(dy) > 60) { scrollToSlide(dy < 0 ? idx + 1 : idx - 1); }
+      touchY = null;
+    });
+
+    setTimeout(() => hint.classList.add('fade'), 3500);
+
+    const orbs = document.querySelectorAll('.orb');
+    window.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - .5) * 20;
+      const y = (e.clientY / window.innerHeight - .5) * 20;
+      orbs.forEach((o, i) => {
+        const k = (i % 3 + 1) * .4;
+        o.style.transform = `translate3d(${x * k}px, ${y * k}px, 0)`;
+      });
+    });
+  </script>
+</body>
+
+</html>
